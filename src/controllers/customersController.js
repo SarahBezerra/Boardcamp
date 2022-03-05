@@ -1,8 +1,21 @@
 import db from '../db.js'
 
 export async function getCustomers(req, res){
+    const queryCPF = req.query.cpf;
 
     try{
+        const customers = await db.query(`SELECT * FROM customers`);
+
+        if(!queryCPF){
+            return res.send(customers.rows);
+        }
+
+        const regex = new RegExp(`\^${queryCPF}`);
+        const filterCustomers = customers.rows.filter(customer => {
+            return regex.test(customer.cpf)
+        })
+
+        res.send(filterCustomers)
 
     }catch(err){
         console.log(err)
