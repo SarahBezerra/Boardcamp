@@ -6,12 +6,8 @@ export async function getRentals(req, res){
     const { gameId } = req.query;
     let query = "";
 
-    if(customerId){
-        query = ` WHERE rentals."customerId"=${customerId}`
-    }
-    if(gameId){
-        query = ` WHERE rentals."gameId"=${gameId}`
-    }
+    customerId ? query = ` WHERE rentals."customerId"=${customerId}` : ""
+    gameId ? query = ` WHERE rentals."gameId"=${gameId}` : ""
 
     try{
         const rentals = await db.query(`
@@ -109,5 +105,25 @@ export async function finalizeRental(req, res){
 }
 
 export async function deleteRental(req, res){
-   
+    const { id } = req.params;
+
+    try{
+        const rental = await db.query(`SELECT * FROM rentals WHERE id=$1`
+        , [id]);
+        if(!rental.rowCount){
+            return res.sendStatus(404);
+        }
+
+        if(rental.returnDate){
+            return res.sendStatus(400);
+        }
+
+        db.query(`DELETE FROM rentals WHERE id=$1`
+        , [id])
+        res.sendStatus(200);
+
+    }catch(err){
+        console.log(err)
+        res.sendStatus(500)
+    }
 }
