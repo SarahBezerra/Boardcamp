@@ -5,7 +5,7 @@ import { createRental, deleteRental, finalizeRental, getRentals } from '../contr
 
 const rentalsRouter = Router();
 
-//rentalsRouter.get('/rentals', getRentals);
+rentalsRouter.get('/rentals', getRentals);
 rentalsRouter.post('/rentals', validateSchemaMiddleware(rentalSchema), createRental);
 //rentalsRouter.post('/rentals/:id/return', finalizeRental);
 //rentalsRouter.delete('/rentals/:id', deleteRental);

@@ -2,6 +2,60 @@ import dayjs from 'dayjs'
 import db from '../db.js'
 
 export async function getRentals(req, res){
+    const { customerId } = req.query;
+    const { gameId } = req.query;
+    let query = "";
+
+    if(customerId){
+        query = ` WHERE rentals."customerId"=${customerId}`
+    }
+    if(gameId){
+        query = ` WHERE rentals."gameId"=${gameId}`
+    }
+
+    try{
+        const rentals = await db.query(`
+            SELECT 
+                rentals.*, 
+                customers.id as "customer_id", customers.name as "customer_name", 
+                games.id as "game_id", games.name as "game_name", games."categoryId" as "game_category", 
+                categories.name AS "categoryName"
+            FROM rentals
+                JOIN customers ON customers.id=rentals."customerId" 
+                JOIN games ON games.id=rentals."gameId"
+                JOIN categories ON categories.id="categoryId"
+            ${query}
+        `);
+
+        const rentalsInfos = rentals.rows.map(rental => {
+            return {
+                id: rental.id,
+                customerId: rental.customerId,
+                gameId: rental.gameId,
+                rentDate: rental.rentDate,
+                daysRented: rental.daysRented,
+                returnDate: rental.returnDate,
+                originalPrice: rental.originalPrice,
+                delayFee: rental.delayFee,
+                customer: {
+                    id: rental.customer_id,
+                    name: rental.customer_name
+                },
+                game: {
+                    id: rental.game_id,
+                    name: rental.game_name,
+                    categoryId: rental.game_category,
+                    categoryName: rental.categoryName
+                }
+            }
+        })
+
+        res.send(rentalsInfos)
+
+    }catch(err){
+        console.log(err)
+        res.sendStatus(500)
+    }
 
 }
 
