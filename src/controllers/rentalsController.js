@@ -4,10 +4,15 @@ import db from '../db.js'
 export async function getRentals(req, res){
     const { customerId } = req.query;
     const { gameId } = req.query;
-    let query = "";
+    let queryString = "";
 
-    customerId ? query = ` WHERE rentals."customerId"=${customerId}` : ""
-    gameId ? query = ` WHERE rentals."gameId"=${gameId}` : ""
+    if(customerId && gameId){
+        queryString = ` WHERE rentals."gameId"=${gameId} AND rentals."customerId"=${customerId}`
+    } else if(customerId){
+        queryString = ` WHERE rentals."customerId"=${customerId}`
+    } else if(gameId){
+        queryString = ` WHERE rentals."gameId"=${gameId}`
+    }
 
     try{
         const rentals = await db.query(`
@@ -20,7 +25,7 @@ export async function getRentals(req, res){
                 JOIN customers ON customers.id=rentals."customerId" 
                 JOIN games ON games.id=rentals."gameId"
                 JOIN categories ON categories.id="categoryId"
-            ${query}
+            ${queryString}
         `);
 
         const rentalsInfos = rentals.rows.map(rental => {
