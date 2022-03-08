@@ -70,16 +70,9 @@ export async function updateCustomer(req, res){
     const { id } = req.params;
 
     try{
-        const customerExists = await db.query(`SELECT * FROM customers WHERE id=$1`
-        , [id]);
-        if(!customerExists.rowCount){
-            return res.sendStatus(404);
-        }
-
-        const cpfExists = await db.query(`SELECT * FROM customers WHERE cpf=$1`
-        , [cpf]);
-
-        if(cpfExists.rowCount && cpfExists?.rows[0].id !== parseInt(id)){
+        const customerExists = await db.query(`SELECT * FROM customers WHERE cpf=$1 AND id!=$2`
+        , [ cpf, id ]);
+        if(customerExists.rowCount){
             return res.sendStatus(409);
         }
 

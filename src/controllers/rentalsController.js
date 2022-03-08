@@ -29,24 +29,27 @@ export async function getRentals(req, res){
         `);
 
         const rentalsInfos = rentals.rows.map(rental => {
+            const { id, customerId, gameId, rentDate, daysRented, returnDate, originalPrice, delayFee,
+                 customer_id, customer_name, game_id, game_name,  game_category, categoryName } = rental;
+
             return {
-                id: rental.id,
-                customerId: rental.customerId,
-                gameId: rental.gameId,
-                rentDate: rental.rentDate,
-                daysRented: rental.daysRented,
-                returnDate: rental.returnDate,
-                originalPrice: rental.originalPrice,
-                delayFee: rental.delayFee,
+                id,
+                customerId,
+                gameId,
+                rentDate,
+                daysRented,
+                returnDate,
+                originalPrice,
+                delayFee,
                 customer: {
-                    id: rental.customer_id,
-                    name: rental.customer_name
+                    id: customer_id,
+                    name: customer_name
                 },
                 game: {
-                    id: rental.game_id,
-                    name: rental.game_name,
-                    categoryId: rental.game_category,
-                    categoryName: rental.categoryName
+                    id: game_id,
+                    name: game_name,
+                    categoryId: game_category,
+                    categoryName
                 }
             }
         })
